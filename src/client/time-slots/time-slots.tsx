@@ -1,6 +1,7 @@
 import { Col, Row, Space, Tabs, Checkbox } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { timeSlotsService } from "./time-slots.service";
 
 export type TimeSlot = {
   value: string;
@@ -31,13 +32,38 @@ const getTimeSlots = (dailyTimeSlots: DailyTimeSlot[]) => {
 };
 
 export const TimeSlots = ({ dailyTimeSlots }: TimeSlotsProps) => {
-  const [slots, setSlots] = useState(() => getTimeSlots(dailyTimeSlots));
+  const [slots, setSlots] = useState<Record<string, boolean>>({});
 
   const handleChange = (event: CheckboxChangeEvent, value: string) => {
     const { checked } = event.target;
 
     setSlots((prevSlots) => ({ ...prevSlots, [value]: checked }));
+
+    if (checked) {
+      timeSlotsService
+        .addTimeSlot({
+          status: "FREE",
+          practitionerId: "1",
+          intervalInMinutes: 60,
+          start: new Date(value),
+        })
+        .then((slot) => {
+          if (!slot) {
+            setSlots((prevSlots) => ({ ...prevSlots, [value]: false }));
+          }
+        });
+    } else {
+      timeSlotsService.removeTimeSlot(value).then((slot) => {
+        if (slot) {
+          setSlots((prevSlots) => ({ ...prevSlots, [value]: true }));
+        }
+      });
+    }
   };
+
+  useEffect(() => {
+    setSlots(getTimeSlots(dailyTimeSlots));
+  }, [dailyTimeSlots]);
 
   return (
     <Tabs

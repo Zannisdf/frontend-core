@@ -1,5 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useState } from "react";
 import { loginWithGoogle } from "./login-strategies/google";
+import { useRouter } from "next/router";
 
 export type User = Awaited<ReturnType<typeof loginWithGoogle>> | null;
 
@@ -19,6 +20,7 @@ export const UserProvider = ({
   children,
 }: PropsWithChildren<Record<never, never>>) => {
   const [user, setUser] = useState<User>(null);
+  const { replace } = useRouter();
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const login = (provider: string) => {
@@ -37,6 +39,7 @@ export const UserProvider = ({
     return authenticateUser().then((currentUser) => {
       setUser(currentUser);
       setIsAuthenticating(false);
+      replace("/sobrecupos");
     });
   };
 

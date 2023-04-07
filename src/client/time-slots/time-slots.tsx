@@ -7,6 +7,7 @@ export type TimeSlot = {
   value: string;
   checked?: boolean;
   label: string;
+  disabled?: boolean;
 };
 
 export type DailyTimeSlot = {
@@ -17,6 +18,7 @@ export type DailyTimeSlot = {
 
 export type TimeSlotsProps = {
   dailyTimeSlots: DailyTimeSlot[];
+  userId: string;
 };
 
 const getTimeSlots = (dailyTimeSlots: DailyTimeSlot[]) => {
@@ -31,7 +33,7 @@ const getTimeSlots = (dailyTimeSlots: DailyTimeSlot[]) => {
   return state;
 };
 
-export const TimeSlots = ({ dailyTimeSlots }: TimeSlotsProps) => {
+export const TimeSlots = ({ dailyTimeSlots, userId }: TimeSlotsProps) => {
   const [slots, setSlots] = useState<Record<string, boolean>>({});
 
   const handleChange = (event: CheckboxChangeEvent, value: string) => {
@@ -43,7 +45,7 @@ export const TimeSlots = ({ dailyTimeSlots }: TimeSlotsProps) => {
       timeSlotsService
         .addTimeSlot({
           status: "FREE",
-          practitionerId: "1",
+          practitionerId: userId,
           intervalInMinutes: 60,
           start: new Date(value),
         })
@@ -53,7 +55,7 @@ export const TimeSlots = ({ dailyTimeSlots }: TimeSlotsProps) => {
           }
         });
     } else {
-      timeSlotsService.removeTimeSlot(value).then((slot) => {
+      timeSlotsService.removeTimeSlot(userId, value).then((slot) => {
         if (slot) {
           setSlots((prevSlots) => ({ ...prevSlots, [value]: true }));
         }
@@ -73,13 +75,14 @@ export const TimeSlots = ({ dailyTimeSlots }: TimeSlotsProps) => {
         label,
         children: (
           <Space direction="vertical" size="small">
-            {contents.map(({ value, label: timeSlotLabel }) => {
+            {contents.map(({ value, label: timeSlotLabel, disabled }) => {
               const composedValue = `${date}T${value}`;
 
               return (
                 <Row key={composedValue}>
                   <Col>
                     <Checkbox
+                      disabled={disabled}
                       checked={slots[composedValue]}
                       onChange={(event) => handleChange(event, composedValue)}
                     >

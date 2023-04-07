@@ -3,21 +3,20 @@ import {
   addDays,
   eachDayOfInterval,
   eachHourOfInterval,
-  endOfDay,
   endOfHour,
   format,
+  isBefore,
   max,
+  startOfDay,
 } from "date-fns";
 import {
   collection,
   addDoc,
   deleteDoc,
-  DocumentReference,
   query,
   where,
   getDocs,
   Timestamp,
-  doc,
 } from "firebase/firestore";
 
 export type TimeSlotDoc = {
@@ -31,7 +30,7 @@ export class TimeSlotsService {
   addTimeSlot(timeSlot: TimeSlotDoc) {
     return addDoc(collection(db, "timeSlots"), {
       status: "FREE",
-      practitionerId: "1",
+      practitionerId: timeSlot.practitionerId,
       intervalInMinutes: 60,
       start: Timestamp.fromDate(timeSlot.start),
     }).catch((error) => {
@@ -40,10 +39,11 @@ export class TimeSlotsService {
     });
   }
 
-  removeTimeSlot(dateString: string) {
+  removeTimeSlot(practitionerId: string, dateString: string) {
     const timeSlotsRef = collection(db, "timeSlots");
     const q = query(
       timeSlotsRef,
+      where('practitionerId', '==', practitionerId),
       where("start", "==", Timestamp.fromDate(new Date(dateString)))
     );
 
@@ -63,10 +63,14 @@ export class TimeSlotsService {
     });
   }
 
-  getTimeSlots(_practitionerId = "1") {
+  getTimeSlots(practitionerId: string) {
     const now = new Date();
     const timeSlotsRef = collection(db, "timeSlots");
-    const q = query(timeSlotsRef, where("start", ">=", now));
+    const q = query(
+      timeSlotsRef,
+      where("practitionerId", "==", practitionerId),
+      where("start", ">=", startOfDay(now))
+    );
 
     const dates = this.getSchedule(now);
 
@@ -130,6 +134,7 @@ export class TimeSlotsService {
             endOfHour(hour),
             "HH:mm"
           )}`,
+          disabled: isBefore(hour, now),
           checked: false,
         }))
       );

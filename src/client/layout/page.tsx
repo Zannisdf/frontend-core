@@ -2,8 +2,9 @@ import { Layout, Menu, theme } from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { PropsWithChildren, useEffect } from "react";
+import { PropsWithChildren } from "react";
 import { useUser } from "../users/user-context";
+import { protectedRoutes } from "../authentication/routes";
 
 export type PageProps = PropsWithChildren<{
   title?: string;
@@ -11,33 +12,12 @@ export type PageProps = PropsWithChildren<{
 
 const { Content, Header } = Layout;
 
-const availableRoutes = {
-  profile: { path: "/perfil", label: "Perfil" },
-  timeSlots: { path: "/sobrecupos", label: "Sobrecupos" },
-  login: { path: "/login", label: "Iniciar Sesión" }
-} as const;
-
-const loggedInRoutes = [
-  availableRoutes.profile,
-  availableRoutes.timeSlots,
-];
-
 export const Page = ({ children, title }: PageProps) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-  const { asPath, replace } = useRouter();
-  const { user } = useUser();
-
-  useEffect(() => {
-    if (!user && asPath !== '/login') {
-      replace(availableRoutes.login.path);
-    }
-
-    if (asPath === "/login" && user) {
-      replace(availableRoutes.timeSlots.path);
-    }
-  }, [asPath]);
+  const { asPath } = useRouter();
+  const { user, logout } = useUser();
 
   return (
     <Layout className="layout" style={{ minHeight: "100vh" }}>
@@ -51,10 +31,20 @@ export const Page = ({ children, title }: PageProps) => {
             theme="dark"
             mode="horizontal"
             selectedKeys={[asPath]}
-            items={loggedInRoutes.map(({ path, label }) => ({
-              key: path,
-              label: <Link href={path}>{label}</Link>,
-            }))}
+            items={[
+              ...protectedRoutes.map(({ path, label }) => ({
+                key: path,
+                label: <Link href={path}>{label}</Link>,
+              })),
+              {
+                key: "/logout",
+                label: (
+                  <a role="button" onClick={logout}>
+                    Salir
+                  </a>
+                ),
+              },
+            ]}
           />
         ) : null}
       </Header>

@@ -1,24 +1,25 @@
+import { WithAuth } from "@frontend-core/client/authentication/with-auth";
 import { Page } from "@frontend-core/client/layout/page";
 import { TimeSlots } from "@frontend-core/client/time-slots";
 import { timeSlotsService } from "@frontend-core/client/time-slots/time-slots.service";
 import { useUser } from "@frontend-core/client/users/user-context";
 import { useEffect, useState } from "react";
 
-export default function Sobrecupos() {
+const TimeSlotsPage = () => {
   const [dailyTimeSlots, setDailyTimeSlots] = useState<any[]>([]);
   const { user } = useUser();
 
   useEffect(() => {
     if (!user) return;
 
-    timeSlotsService
-      .getTimeSlots(user?.user.uid)
-      .then((r) => setDailyTimeSlots(r));
+    timeSlotsService.getTimeSlots(user.uid).then((r) => setDailyTimeSlots(r));
   }, []);
 
-  return (
+  return user ? (
     <Page title="Mis sobrecupos">
-      <TimeSlots dailyTimeSlots={dailyTimeSlots} userId={user!.user.uid} />
+      <TimeSlots dailyTimeSlots={dailyTimeSlots} userId={user.uid} />
     </Page>
-  );
-}
+  ) : null;
+};
+
+export default WithAuth(TimeSlotsPage);

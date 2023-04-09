@@ -22,30 +22,6 @@ export const Profile = () => {
       autoComplete="off"
     >
       <Form.Item
-        label="Correo electrónico"
-        name="email"
-        rules={[{ required: true, message: "¡Ingresa tu correo electrónico!" }]}
-      >
-        <Input placeholder="jose@sobrecupos.com" />
-      </Form.Item>
-
-      <Form.Item
-        label="Número de registro"
-        name="licenseId"
-        rules={[{ required: true, message: "¡Ingresa tu número de registro!" }]}
-      >
-        <Input placeholder="12345" />
-      </Form.Item>
-
-      <Form.Item
-        label="RUT"
-        name="dni"
-        rules={[{ required: true, message: "¡Ingresa tu rut!" }]}
-      >
-        <Input placeholder="10123456-0" />
-      </Form.Item>
-
-      <Form.Item
         label="Dirección de la consulta"
         name="practiceAddress"
         rules={[

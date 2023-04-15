@@ -8,14 +8,15 @@ import {
 import { loginWithGoogle } from "./login-strategies/google";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@frontend-core/server/firebase/auth";
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 import { UserDoc, userService } from "../user.service";
+import { loginWithEmailLink } from "./login-strategies/email-link";
 
 export type User = UserDoc | null;
 
 export const UserContext = createContext<{
   user: User;
-  login: (provider: string) => void;
+  login: (provider: string, email?: string) => void;
   logout: () => void;
   isAuthenticating: boolean;
 }>({
@@ -38,18 +39,24 @@ export const UserProvider = ({
     isAuthenticating: true,
   });
 
-  const login = (provider: string) => {
-    let authenticateUser = loginWithGoogle;
-
+  const login = async (provider: string, email?: string) => {
     if (provider === "GOOGLE") {
-      authenticateUser = loginWithGoogle;
+      await loginWithGoogle();
+      return;
     }
 
-    // if (provider === "EMAIL_LINK") {
-    //   authenticateUser = loginWithEmailLink;
-    // }
+    if (provider === "EMAIL_LINK") {
+      if (!email) {
+        console.log("Email not provided for strategy EMAIL_LINK");
+        return;
+      }
 
-    authenticateUser();
+      await loginWithEmailLink(email);
+      message.info("¡Se envió un link de acceso a tu correo electrónico!");
+      return;
+    }
+
+    console.log(`Strategy ${provider} is not supported`);
   };
 
   const logout = () => {
@@ -59,11 +66,9 @@ export const UserProvider = ({
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        userService
-          .getOrCreateUser(user)
-          .then((userDoc) => {
-            setUser({ user: userDoc, isAuthenticating: false })
-          });
+        userService.getOrCreateUser(user).then((userDoc) => {
+          setUser({ user: userDoc, isAuthenticating: false });
+        });
         return;
       }
 

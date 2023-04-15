@@ -5,14 +5,14 @@ import Image from "next/image";
 
 export const LoginForm = () => {
   const { login } = useUser();
-  const onFinish = () => {
-    login("EMAIL_LINK");
+  const onFinish = (values: any) => {
+    login("EMAIL_LINK", values.email);
   };
   const onFinishFailed = () => {};
 
   return (
     <>
-      {/* <Form
+      <Form
         name="login"
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
@@ -39,9 +39,9 @@ export const LoginForm = () => {
         </Form.Item>
       </Form>
 
-      <Divider style={{ margin: "36px 0" }} /> */}
+      <Divider style={{ margin: "28px 0" }} />
 
-      <div style={{ padding: "0 24px" }}>
+      <div style={{ padding: "0 24px 12px" }}>
         <Button
           block
           size="large"

@@ -12,7 +12,11 @@ export const WithLoginRedirect = <T extends JSXElementConstructor<any>>(
 
     useEffect(() => {
       if (user) {
-        replace(availableRoutes.timeSlots.path);
+        const redirectPath = user.isActivePractitioner
+          ? availableRoutes.timeSlots.path
+          : availableRoutes.waitingActivation.path;
+
+        replace(redirectPath);
       }
     }, [user]);
 

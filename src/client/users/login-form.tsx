@@ -1,17 +1,18 @@
 import { GoogleOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, Input } from "antd";
 import { useUser } from "./user-context";
+import Image from "next/image";
 
 export const LoginForm = () => {
   const { login } = useUser();
   const onFinish = () => {
-    login('EMAIL_LINK');
+    login("EMAIL_LINK");
   };
   const onFinishFailed = () => {};
 
   return (
     <>
-      <Form
+      {/* <Form
         name="login"
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
@@ -38,7 +39,7 @@ export const LoginForm = () => {
         </Form.Item>
       </Form>
 
-      <Divider style={{ margin: "36px 0" }} />
+      <Divider style={{ margin: "36px 0" }} /> */}
 
       <div style={{ padding: "0 24px" }}>
         <Button
@@ -48,7 +49,14 @@ export const LoginForm = () => {
           htmlType="button"
           onClick={() => login("GOOGLE")}
         >
-          <GoogleOutlined /> Iniciar sesión con Google
+          <Image
+            src="/google-logo.png"
+            height="24"
+            width="24"
+            alt="Google logo"
+            style={{ margin: '0 4px 2px 0' }}
+          />{" "}
+          Iniciar sesión con Google
         </Button>
       </div>
     </>

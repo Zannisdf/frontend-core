@@ -9,17 +9,18 @@ import { loginWithGoogle } from "./login-strategies/google";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@frontend-core/server/firebase/auth";
 import { Spin } from "antd";
+import { UserDoc, userService } from "../user.service";
 
-export type User = Awaited<ReturnType<typeof loginWithGoogle>> | null;
+export type User = UserDoc | null;
 
 export const UserContext = createContext<{
   user: User;
-  login: (provider: string) => Promise<User | null>;
+  login: (provider: string) => void;
   logout: () => void;
   isAuthenticating: boolean;
 }>({
   user: null,
-  login: (_p) => Promise.resolve(null),
+  login: (_p) => {},
   logout: () => {},
   isAuthenticating: true,
 });
@@ -29,7 +30,10 @@ export const useUser = () => useContext(UserContext);
 export const UserProvider = ({
   children,
 }: PropsWithChildren<Record<never, never>>) => {
-  const [user, setUser] = useState<{ user: User; isAuthenticating: boolean }>({
+  const [user, setUser] = useState<{
+    user: User;
+    isAuthenticating: boolean;
+  }>({
     user: null,
     isAuthenticating: true,
   });
@@ -45,9 +49,7 @@ export const UserProvider = ({
     //   authenticateUser = loginWithEmailLink;
     // }
 
-    return authenticateUser().then((user) =>
-      setUser({ user, isAuthenticating: false })
-    );
+    authenticateUser();
   };
 
   const logout = () => {
@@ -55,9 +57,18 @@ export const UserProvider = ({
   };
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) =>
-      setUser({ user, isAuthenticating: false })
-    );
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userService
+          .getOrCreateUser(user)
+          .then((userDoc) => {
+            setUser({ user: userDoc, isAuthenticating: false })
+          });
+        return;
+      }
+
+      setUser({ user: null, isAuthenticating: false });
+    });
   }, []);
 
   return (

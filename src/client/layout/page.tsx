@@ -4,38 +4,59 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
 import { useUser } from "../users/user-context";
-import { protectedRoutes } from "../authentication/routes";
+import { signedInNavbarRoutes } from "../authentication/routes";
+import Image from "next/image";
 
 export type PageProps = PropsWithChildren<{
   title?: string;
+  seoTitle?: string;
 }>;
 
 const { Content, Header } = Layout;
 
-export const Page = ({ children, title }: PageProps) => {
+export const Page = ({ children, title, seoTitle }: PageProps) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
   const { asPath } = useRouter();
   const { user, logout } = useUser();
+  const navbarBaseRoutes = user?.isActivePractitioner
+    ? signedInNavbarRoutes.map(({ path, label }) => ({
+        key: path,
+        label: <Link href={path}>{label}</Link>,
+      }))
+    : [];
 
   return (
     <Layout className="layout" style={{ minHeight: "100vh" }}>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href="/sobrecupos-logo-isotype.png" />
+        {seoTitle ? <title>{seoTitle}</title> : null}
       </Head>
-      <Header>
-        <div className="logo" />
+      <Header style={{ paddingInline: "24px" }}>
+        <div
+          className="logo"
+          style={{
+            display: "inline-block",
+            float: "left",
+            marginRight: "16px",
+          }}
+        >
+          <Image
+            src="/sobrecupos-logo-isotype.png"
+            width="32"
+            height="32"
+            alt="Logo Sobrecupos"
+          />
+        </div>
         {user ? (
           <Menu
             theme="dark"
             mode="horizontal"
             selectedKeys={[asPath]}
             items={[
-              ...protectedRoutes.map(({ path, label }) => ({
-                key: path,
-                label: <Link href={path}>{label}</Link>,
-              })),
+              ...navbarBaseRoutes,
               {
                 key: "/logout",
                 label: (

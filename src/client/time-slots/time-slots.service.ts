@@ -9,6 +9,7 @@ import {
   max,
   startOfDay,
 } from "date-fns";
+import { es } from "date-fns/locale";
 import {
   collection,
   addDoc,
@@ -43,7 +44,7 @@ export class TimeSlotsService {
     const timeSlotsRef = collection(db, "timeSlots");
     const q = query(
       timeSlotsRef,
-      where('practitionerId', '==', practitionerId),
+      where("practitionerId", "==", practitionerId),
       where("start", "==", Timestamp.fromDate(new Date(dateString)))
     );
 
@@ -97,9 +98,12 @@ export class TimeSlotsService {
       const formattedDates: any[] = [];
 
       dates.forEach((value, key) => {
+        const actualDate = new Date(key);
+        const label = format(actualDate, "iii dd/MM", { locale: es });
+
         formattedDates.push({
           date: key,
-          label: key,
+          label: label[0].toUpperCase() + label.slice(1),
           contents: value,
         });
       });

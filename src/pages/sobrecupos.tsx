@@ -12,12 +12,12 @@ const TimeSlotsPage = () => {
   useEffect(() => {
     if (!user) return;
 
-    timeSlotsService.getTimeSlots(user.uid).then((r) => setDailyTimeSlots(r));
+    timeSlotsService.getTimeSlots(user.userId).then((r) => setDailyTimeSlots(r));
   }, []);
 
   return user ? (
-    <Page title="Mis sobrecupos">
-      <TimeSlots dailyTimeSlots={dailyTimeSlots} userId={user.uid} />
+    <Page title="Sobrecupos para los siguientes siete días" seoTitle="Mis sobrecupos | Sobrecupos" >
+      <TimeSlots dailyTimeSlots={dailyTimeSlots} userId={user.userId} />
     </Page>
   ) : null;
 };

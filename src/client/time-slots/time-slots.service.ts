@@ -5,6 +5,7 @@ import {
   eachHourOfInterval,
   endOfHour,
   format,
+  isAfter,
   isBefore,
   max,
   startOfDay,
@@ -18,6 +19,8 @@ import {
   where,
   getDocs,
   Timestamp,
+  doc,
+  writeBatch,
 } from "firebase/firestore";
 
 export type TimeSlotDoc = {
@@ -38,6 +41,76 @@ export class TimeSlotsService {
       console.log(error);
       return null;
     });
+  }
+
+  async updateTimeSlots(
+    practitionerId: string,
+    timeSlots: Record<string, boolean>
+  ) {
+    const batch = writeBatch(db);
+
+    const dates = Object.keys(timeSlots);
+
+    const timeSlotsRef = collection(db, "timeSlots");
+    const q = query(
+      timeSlotsRef,
+      where("practitionerId", "==", practitionerId),
+      where("start", ">", Timestamp.fromDate(new Date()))
+    );
+    const snapshots = await getDocs(q);
+
+    const updated: string[] = [];
+    const deleted: string[] = [];
+    const added: string[] = [];
+
+    snapshots.forEach((snapshot) => {
+      const data = snapshot.data();
+      const start = data.start.toDate();
+      const date = format(start, "yyyy-MM-dd");
+      const time = format(start, "HH:mm:ss");
+      const dateString = `${date}T${time}`;
+
+      if (!timeSlots[dateString]) {
+        batch.delete(doc(db, "timeSlots", snapshot.id));
+        deleted.push(dateString);
+        return;
+      }
+
+      if (timeSlots[dateString]) {
+        updated.push(dateString);
+        // update logic
+      }
+    });
+
+    dates.forEach((date) => {
+      const timeSlot = timeSlots[date];
+
+      if (
+        timeSlot &&
+        isAfter(new Date(date), new Date()) &&
+        !updated.includes(date) &&
+        !deleted.includes(date)
+      ) {
+        const ref = doc(collection(db, "timeSlots"));
+
+        batch.set(ref, {
+          status: "FREE",
+          practitionerId: practitionerId,
+          intervalInMinutes: 60,
+          start: Timestamp.fromDate(new Date(date)),
+        });
+
+        added.push(date);
+      }
+    });
+
+    await batch.commit();
+
+    return {
+      added,
+      updated,
+      deleted,
+    };
   }
 
   removeTimeSlot(practitionerId: string, dateString: string) {
@@ -61,6 +134,16 @@ export class TimeSlotsService {
           console.log(error);
           return dateString;
         });
+    });
+  }
+
+  sendNotification(email: string, timeSlots: Record<string, any>) {
+    return fetch("/api/notify-time-slot", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        timeSlots,
+      }),
     });
   }
 

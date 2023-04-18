@@ -153,7 +153,7 @@ export class TimeSlotsService {
     const q = query(
       timeSlotsRef,
       where("practitionerId", "==", practitionerId),
-      where("start", ">=", startOfDay(now))
+      where("start", ">", startOfDay(now))
     );
 
     const dates = this.getSchedule(now);
@@ -181,7 +181,7 @@ export class TimeSlotsService {
       const formattedDates: any[] = [];
 
       dates.forEach((value, key) => {
-        const actualDate = new Date(key);
+        const actualDate = new Date(`${key}T08:00:00`);
         const label = format(actualDate, "iii dd/MM", { locale: es });
 
         formattedDates.push({

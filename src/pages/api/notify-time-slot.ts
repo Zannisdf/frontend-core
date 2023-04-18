@@ -11,9 +11,11 @@ function buildMessage({
   const paragraphs = [
     `Se modificó el calendario de: ${email}\n`,
     `Horarios eliminados:`,
-    `${timeSlots.deleted.join("\n")}\n`,
+    `${
+      timeSlots.deleted.length > 0 ? timeSlots.deleted.join("\n") : "Ninguno"
+    }`,
     `Horarios agregados:`,
-    `${timeSlots.added.join("\n")}\n`,
+    `${timeSlots.added.length > 0 ? timeSlots.added.join("\n") : "Ninguno"} `,
     `No respondas este mensaje :)`,
   ];
 
@@ -29,11 +31,13 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     },
   });
 
+  const data = JSON.parse(req.body);
+
   const message = {
     from: `Sobrecupos.app <${process.env.MAILER_EMAIL}>`,
     to: process.env.TIME_SLOT_NOTIFICATION_RECIPIENTS,
-    subject: "Se modificó un sobrecupo a través de sobrecupos.app",
-    text: buildMessage(JSON.parse(req.body)),
+    subject: `Se modificaron los sobrecupos de ${data.email}`,
+    text: buildMessage(data),
   };
 
   return transporter

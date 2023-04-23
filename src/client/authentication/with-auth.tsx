@@ -19,6 +19,10 @@ export const WithAuth = <T extends JSXElementConstructor<any>>(
         replace(availableRoutes.login.path);
         return;
       }
+
+      if (!user?.isActivePractitioner) {
+        replace(availableRoutes.waitingActivation.path);
+      }
     }, [redirectToLoginPage]);
 
     return <Component {...pageProps} />;

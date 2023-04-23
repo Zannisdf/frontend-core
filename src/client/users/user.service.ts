@@ -48,15 +48,32 @@ export class UserService {
     const userRef = collection(db, "users");
     const q = query(userRef, where("email", "==", email));
 
+    let sendEmail = false;
+
     return getDocs(q).then((snapshots) => {
       const promises: any = [];
 
       snapshots.forEach((snapshot) => {
-        promises.push(updateDoc(snapshot.ref, { isActivePractitioner: true }));
+        const data = snapshot.data();
+
+        if (data.isActivePractitioner) {
+          promises.push(Promise.resolve({ sendEmail: true, user: data }));
+        } else {
+          promises.push(
+            updateDoc(snapshot.ref, { isActivePractitioner: true }),
+          );
+          sendEmail = true;
+        }
       });
 
       return Promise.all(promises)
-        .then(([user]) => user)
+        .then(([user]) => {
+          if (sendEmail) {
+            this.notifyUserActivated(email)
+          }
+
+          return user;
+        })
         .catch((error) => {
           console.log(error);
           return null;
@@ -119,6 +136,15 @@ export class UserService {
       body: JSON.stringify({
         email,
         activationLink: `https://www.sobrecupos.app/activar-usuario?email=${email}`,
+      }),
+    });
+  }
+
+  notifyUserActivated(email: string) {
+    return fetch("/api/notify-user-activated", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
       }),
     });
   }

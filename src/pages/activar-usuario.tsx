@@ -1,4 +1,3 @@
-import { InfoCircleOutlined } from "@ant-design/icons";
 import { availableRoutes } from "@frontend-core/client/authentication/routes";
 import { WithAuth } from "@frontend-core/client/authentication/with-auth";
 import { Page } from "@frontend-core/client/layout/page";
@@ -19,7 +18,17 @@ const ActivarUsuario = () => {
   const activateUser = async ({ email }: { email: string }) => {
     setIsValidating(true);
 
-    await userService.activateUser(email);
+    await userService.activateUser(email).catch((error) => {
+      console.log(error);
+      messageApi.open({
+        type: "error",
+        content: `Ocurrió un error activando el correo ${email}`,
+      });
+    });
+    messageApi.open({
+      type: "success",
+      content: `Se activó el usuario ${email}`,
+    });
 
     setIsValidating(false);
   };
@@ -48,6 +57,9 @@ const ActivarUsuario = () => {
             content: `Ocurrió un error activando el correo ${query.email}`,
           });
         });
+    } else {
+      setIsLoading(false);
+      setIsValidating(false);
     }
   }, []);
 

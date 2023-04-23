@@ -3,7 +3,8 @@ export const availableRoutes = {
   timeSlots: { path: "/sobrecupos", label: "Sobrecupos" },
   waitingActivation: { path: "/verificacion", label: "Verificación de cuenta" },
   login: { path: "/login", label: "Iniciar Sesión" },
-  index: { path: '/', label: 'Inicio' }
+  activateUser: { path: "/activar-usuario", label: "Activar" },
+  index: { path: "/", label: "Inicio" },
 } as const;
 
 export const protectedRoutes = [
@@ -13,6 +14,6 @@ export const protectedRoutes = [
   availableRoutes.index,
 ];
 
-export const signedInNavbarRoutes = [
-  availableRoutes.timeSlots,
-]
+export const signedInNavbarRoutes = [availableRoutes.timeSlots];
+
+export const superUserNavbarRoutes = [availableRoutes.activateUser];

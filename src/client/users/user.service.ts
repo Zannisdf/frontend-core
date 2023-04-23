@@ -20,10 +20,11 @@ export type UserDoc = {
   licenseId: string;
   specialty: string;
   isActivePractitioner?: boolean;
+  isSuperUser?: boolean;
 };
 
 export class UserService {
-  editUser(user: UserDoc) {
+  editUser(user: Partial<UserDoc>) {
     const userRef = collection(db, "users");
     const q = query(userRef, where("userId", "==", user.userId));
 
@@ -32,6 +33,26 @@ export class UserService {
 
       snapshots.forEach((snapshot) => {
         promises.push(updateDoc(snapshot.ref, user));
+      });
+
+      return Promise.all(promises)
+        .then(([user]) => user)
+        .catch((error) => {
+          console.log(error);
+          return null;
+        });
+    });
+  }
+
+  activateUser(email: string) {
+    const userRef = collection(db, "users");
+    const q = query(userRef, where("email", "==", email));
+
+    return getDocs(q).then((snapshots) => {
+      const promises: any = [];
+
+      snapshots.forEach((snapshot) => {
+        promises.push(updateDoc(snapshot.ref, { isActivePractitioner: true }));
       });
 
       return Promise.all(promises)
@@ -64,7 +85,7 @@ export class UserService {
     const data: any[] = [];
 
     snapshots.forEach((snapshot) => {
-      data.push(snapshot.data())
+      data.push(snapshot.data());
     });
 
     if (data.length > 0) {
@@ -87,7 +108,19 @@ export class UserService {
 
     await addDoc(userRef, payload);
 
+    this.notifyUserCreated(user.email).catch((error) => console.log(error));
+
     return payload;
+  }
+
+  notifyUserCreated(email: string) {
+    return fetch("/api/notify-user-created", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        activationLink: `https://www.sobrecupos.app/activar-usuario?email=${email}`,
+      }),
+    });
   }
 
   isActivePractitioner(userId: string) {

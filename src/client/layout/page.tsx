@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
 import { useUser } from "../users/user-context";
-import { signedInNavbarRoutes } from "../authentication/routes";
+import {
+  signedInNavbarRoutes,
+  superUserNavbarRoutes,
+} from "../authentication/routes";
 import Image from "next/image";
 
 export type PageProps = PropsWithChildren<{
@@ -21,8 +24,11 @@ export const Page = ({ children, title, seoTitle, isLoading }: PageProps) => {
   } = theme.useToken();
   const { asPath } = useRouter();
   const { user, logout } = useUser();
+  const baseRoutes = user?.isSuperUser
+    ? [...signedInNavbarRoutes, ...superUserNavbarRoutes]
+    : signedInNavbarRoutes;
   const navbarBaseRoutes = user?.isActivePractitioner
-    ? signedInNavbarRoutes.map(({ path, label }) => ({
+    ? baseRoutes.map(({ path, label }) => ({
         key: path,
         label: <Link href={path}>{label}</Link>,
       }))

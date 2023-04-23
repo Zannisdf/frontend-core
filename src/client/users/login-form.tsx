@@ -4,7 +4,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import { EmailAuthProvider, GoogleAuthProvider, getAuth } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { Spin } from "antd";
+import { Alert, Spin } from "antd";
 import { availableRoutes } from "../authentication/routes";
 
 declare global {
@@ -16,6 +16,7 @@ declare global {
 
 export const LoginForm = () => {
   const [isReady, setIsReady] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     if (!isReady) return;
@@ -37,10 +38,23 @@ export const LoginForm = () => {
     ui.start("#firebaseui-auth-container", uiConfig);
   }, [isReady]);
 
+  if (hasError) {
+    return (
+      <Alert
+        style={{ margin: '0 24px' }}
+        message="Algo salió mal"
+        description="Intenta recargando la página"
+        type="error"
+        showIcon
+      />
+    );
+  }
+
   return (
     <>
       <Script
         onLoad={() => setIsReady(true)}
+        onError={() => setHasError(true)}
         src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth__es_419.js"
       />
       <Head>

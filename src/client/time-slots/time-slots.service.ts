@@ -28,6 +28,7 @@ export type TimeSlotDoc = {
   intervalInMinutes: 60;
   practitionerId: string;
   status?: "FREE" | "RESERVED" | "PAID" | "FINISHED" | "NO_SHOW";
+  practiceAddress: string | null;
 };
 
 export class TimeSlotsService {
@@ -45,7 +46,10 @@ export class TimeSlotsService {
 
   async updateTimeSlots(
     practitionerId: string,
-    timeSlots: Record<string, boolean>
+    timeSlots: Record<
+      string,
+      { active: boolean; practiceAddress: string | null }
+    >
   ) {
     const batch = writeBatch(db);
 
@@ -59,9 +63,9 @@ export class TimeSlotsService {
     );
     const snapshots = await getDocs(q);
 
-    const updated: string[] = [];
-    const deleted: string[] = [];
-    const added: string[] = [];
+    const deleted: { date: string; practiceAddress: string }[] = [];
+    const updated: { date: string; practiceAddress: string }[] = [];
+    const added: { date: string; practiceAddress: string }[] = [];
 
     snapshots.forEach((snapshot) => {
       const data = snapshot.data();
@@ -70,15 +74,25 @@ export class TimeSlotsService {
       const time = format(start, "HH:mm:ss");
       const dateString = `${date}T${time}`;
 
-      if (!timeSlots[dateString]) {
+      const currentTimeSlot = timeSlots[dateString];
+
+      if (
+        !currentTimeSlot?.active ||
+        currentTimeSlot?.practiceAddress !== data.practiceAddress
+      ) {
         batch.delete(doc(db, "timeSlots", snapshot.id));
-        deleted.push(dateString);
+        deleted.push({
+          date: dateString,
+          practiceAddress: data.practiceAddress,
+        });
         return;
       }
 
-      if (timeSlots[dateString]) {
-        updated.push(dateString);
-        // update logic
+      if (currentTimeSlot.active) {
+        updated.push({
+          date: dateString,
+          practiceAddress: data.practiceAddress,
+        });
       }
     });
 
@@ -86,10 +100,9 @@ export class TimeSlotsService {
       const timeSlot = timeSlots[date];
 
       if (
-        timeSlot &&
+        timeSlot?.active &&
         isAfter(new Date(date), new Date()) &&
-        !updated.includes(date) &&
-        !deleted.includes(date)
+        !updated.find((update) => update.date === date)
       ) {
         const ref = doc(collection(db, "timeSlots"));
 
@@ -98,9 +111,10 @@ export class TimeSlotsService {
           practitionerId: practitionerId,
           intervalInMinutes: 60,
           start: Timestamp.fromDate(new Date(date)),
+          practiceAddress: timeSlot.practiceAddress,
         });
 
-        added.push(date);
+        added.push({ date, practiceAddress: timeSlot.practiceAddress! });
       }
     });
 
@@ -108,7 +122,6 @@ export class TimeSlotsService {
 
     return {
       added,
-      updated,
       deleted,
     };
   }
@@ -170,10 +183,15 @@ export class TimeSlotsService {
         if (selectedDate) {
           dates.set(
             date,
-            selectedDate.map((dateValue) => ({
-              ...dateValue,
-              checked: dateValue.checked || time === dateValue.value,
-            }))
+            selectedDate.map((dateValue) =>
+              dateValue.value === time
+                ? {
+                    ...dateValue,
+                    checked: true,
+                    practiceAddress: data.practiceAddress,
+                  }
+                : dateValue
+            )
           );
         }
       });

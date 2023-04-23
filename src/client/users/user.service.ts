@@ -17,6 +17,7 @@ export type UserDoc = {
   email: string;
   phone?: string;
   practiceAddress: string;
+  practiceAddresses: string[];
   licenseId: string;
   specialty: string;
   isActivePractitioner?: boolean;
@@ -118,6 +119,7 @@ export class UserService {
       email: user.email,
       phone: "",
       practiceAddress: "",
+      practiceAddresses: [],
       licenseId: "",
       specialty: "",
       isActivePractitioner: false,

@@ -1,5 +1,23 @@
+import { addHours, format } from "date-fns";
+import { es } from "date-fns/locale";
 import { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
+
+const toDateNotificationFormat = ({
+  date,
+  practiceAddress,
+}: {
+  date: string;
+  practiceAddress: string;
+}) => {
+  const d = new Date(date);
+  const day = format(d, "iiii dd/MM", { locale: es });
+  const formattedDay = day[0].toUpperCase() + day.slice(1);
+  const start = format(d, "HH:mm", { locale: es });
+  const end = format(addHours(d, 1), "HH:mm", { locale: es });
+
+  return `${formattedDay} entre las ${start} y las ${end} en ${practiceAddress}`;
+};
 
 function buildMessage({
   email,
@@ -12,10 +30,17 @@ function buildMessage({
     `Se modificó el calendario de: ${email}\n`,
     `Horarios eliminados:`,
     `${
-      timeSlots.deleted.length > 0 ? timeSlots.deleted.join("\n") : "Ninguno"
+      timeSlots.deleted.length > 0
+        ? timeSlots.deleted.map(toDateNotificationFormat).join("\n")
+        : "Ninguno"
     }`,
     `Horarios agregados:`,
-    `${timeSlots.added.length > 0 ? timeSlots.added.join("\n") : "Ninguno"} `,
+    `${
+      timeSlots.added.length > 0
+        ? timeSlots.added.map(toDateNotificationFormat).join("\n")
+        : "Ninguno"
+    } `,
+    `\n`,
     `No respondas este mensaje :)`,
   ];
 

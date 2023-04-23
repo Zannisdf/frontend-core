@@ -1,24 +1,6 @@
 import { WithAuth } from "@frontend-core/client/authentication/with-auth";
-import { Spin } from "antd";
-import Head from "next/head";
+import { Page } from "@frontend-core/client/layout/page";
 
-const Inicio = () => (
-  <>
-    <Head>
-      <title>Sobrecupos</title>
-    </Head>
-    <div
-      style={{
-        height: "100vh",
-        width: "100vw",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Spin />
-    </div>
-  </>
-);
+const Inicio = () => <Page isLoading seoTitle="Sobrecupos" />;
 
 export default WithAuth(Inicio);

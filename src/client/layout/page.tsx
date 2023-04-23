@@ -1,4 +1,4 @@
-import { Layout, Menu, theme } from "antd";
+import { Layout, Menu, Spin, theme } from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -10,11 +10,12 @@ import Image from "next/image";
 export type PageProps = PropsWithChildren<{
   title?: string;
   seoTitle?: string;
+  isLoading?: boolean;
 }>;
 
 const { Content, Header } = Layout;
 
-export const Page = ({ children, title, seoTitle }: PageProps) => {
+export const Page = ({ children, title, seoTitle, isLoading }: PageProps) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -26,6 +27,32 @@ export const Page = ({ children, title, seoTitle }: PageProps) => {
         label: <Link href={path}>{label}</Link>,
       }))
     : [];
+
+  if (isLoading) {
+    return (
+      <>
+        <Head>
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+          />
+          <link rel="icon" href="/sobrecupos-logo-isotype.png" />
+          {seoTitle ? <title>{seoTitle}</title> : null}
+        </Head>
+        <div
+          style={{
+            height: "100vh",
+            width: "100vw",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Spin />
+        </div>
+      </>
+    );
+  }
 
   return (
     <Layout className="layout" style={{ minHeight: "100vh" }}>

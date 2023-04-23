@@ -5,8 +5,8 @@ function buildMessage() {
   const paragraphs = [
     `¡Hola! Te doy la bienvenida a Sobrecupos.\n`,
     `Ya puedes cargar tus sobrecupos usando el siguiente link: https://www.sobrecupos.app/sobrecupos\n`,
-    `Si tienes alguna duda no dudes en escribirme.`,
-    `Giorgio, CTO.`
+    `Si tienes alguna duda no dudes en escribirme a giorgio@sobrecupos.com`,
+    `Giorgio, founder y CTO.`,
   ];
 
   return paragraphs.join("\n");

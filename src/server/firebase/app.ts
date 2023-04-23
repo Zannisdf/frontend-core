@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_KEY,
-  authDomain: "auth.sobrecupos.app",
+  authDomain: "www.sobrecupos.app",
   projectId: "frontend-core-bfc4e",
   storageBucket: "frontend-core-bfc4e.appspot.com",
   messagingSenderId: "1070466089894",

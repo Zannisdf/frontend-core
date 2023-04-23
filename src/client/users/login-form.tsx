@@ -1,64 +1,70 @@
-import { GoogleOutlined } from "@ant-design/icons";
-import { Button, Divider, Form, Input } from "antd";
-import { useUser } from "./user-context";
-import Image from "next/image";
+import Head from "next/head";
+import Script from "next/script";
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import { EmailAuthProvider, GoogleAuthProvider, getAuth } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { Spin } from "antd";
+import { availableRoutes } from "../authentication/routes";
+
+declare global {
+  interface Window {
+    firebase: any;
+    firebaseui: any;
+  }
+}
 
 export const LoginForm = () => {
-  const { login } = useUser();
-  const onFinish = () => {
-    login("EMAIL_LINK");
-  };
-  const onFinishFailed = () => {};
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    if (!isReady) return;
+
+    window.firebase = firebase;
+
+    const ui = new window.firebaseui.auth.AuthUI(getAuth());
+    const uiConfig = {
+      signInSuccessUrl: availableRoutes.timeSlots.path,
+      signInOptions: [
+        {
+          provider: EmailAuthProvider.PROVIDER_ID,
+          signInMethod: EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD,
+        },
+        GoogleAuthProvider.PROVIDER_ID,
+      ],
+    };
+
+    ui.start("#firebaseui-auth-container", uiConfig);
+  }, [isReady]);
 
   return (
     <>
-      {/* <Form
-        name="login"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        style={{ maxWidth: 600, padding: "0 24px" }}
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
-      >
-        <Form.Item
-          label="Correo electrónico"
-          name="email"
-          rules={[
-            { required: true, message: "¡Ingresa tu correo electrónico!" },
-          ]}
+      <Script
+        onLoad={() => setIsReady(true)}
+        src="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth__es_419.js"
+      />
+      <Head>
+        <link
+          type="text/css"
+          rel="stylesheet"
+          href="https://www.gstatic.com/firebasejs/ui/6.0.2/firebase-ui-auth.css"
+        />
+      </Head>
+
+      {isReady ? null : (
+        <div
+          style={{
+            height: "100vh",
+            width: "100vw",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
         >
-          <Input placeholder="jose@sobrecupos.com" />
-        </Form.Item>
-
-        <Form.Item>
-          <Button block size="large" type="primary" htmlType="submit">
-            Iniciar sesión
-          </Button>
-        </Form.Item>
-      </Form>
-
-      <Divider style={{ margin: "36px 0" }} /> */}
-
-      <div style={{ padding: "0 24px" }}>
-        <Button
-          block
-          size="large"
-          type="default"
-          htmlType="button"
-          onClick={() => login("GOOGLE")}
-        >
-          <Image
-            src="/google-logo.png"
-            height="24"
-            width="24"
-            alt="Google logo"
-            style={{ margin: '0 4px 2px 0' }}
-          />{" "}
-          Iniciar sesión con Google
-        </Button>
-      </div>
+          <Spin />
+        </div>
+      )}
+      <div id="firebaseui-auth-container" />
     </>
   );
 };

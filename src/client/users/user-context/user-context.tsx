@@ -31,7 +31,7 @@ export const useUser = () => useContext(UserContext);
 export const UserProvider = ({
   children,
 }: PropsWithChildren<Record<never, never>>) => {
-  const { query } = useRouter();
+  const router = useRouter();
   const [user, setUser] = useState<{
     user: User;
     isAuthenticating: boolean;
@@ -57,9 +57,13 @@ export const UserProvider = ({
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        userService.getOrCreateUser(user, query.email as string).then((userDoc) => {
-          setUser({ user: userDoc, isAuthenticating: false });
-        });
+        const impersonate = router.asPath.split('?verCalendario=')[1]
+
+        userService
+          .getOrCreateUser(user, impersonate as string)
+          .then((userDoc) => {
+            setUser({ user: userDoc, isAuthenticating: false });
+          });
         return;
       }
 

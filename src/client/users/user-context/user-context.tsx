@@ -10,6 +10,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@frontend-core/server/firebase/auth";
 import { Spin } from "antd";
 import { UserDoc, userService } from "../user.service";
+import { useRouter } from "next/router";
 
 export type User = UserDoc | null;
 
@@ -30,6 +31,7 @@ export const useUser = () => useContext(UserContext);
 export const UserProvider = ({
   children,
 }: PropsWithChildren<Record<never, never>>) => {
+  const { query } = useRouter();
   const [user, setUser] = useState<{
     user: User;
     isAuthenticating: boolean;
@@ -45,10 +47,6 @@ export const UserProvider = ({
       authenticateUser = loginWithGoogle;
     }
 
-    // if (provider === "EMAIL_LINK") {
-    //   authenticateUser = loginWithEmailLink;
-    // }
-
     authenticateUser();
   };
 
@@ -59,11 +57,9 @@ export const UserProvider = ({
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        userService
-          .getOrCreateUser(user)
-          .then((userDoc) => {
-            setUser({ user: userDoc, isAuthenticating: false })
-          });
+        userService.getOrCreateUser(user, query.email as string).then((userDoc) => {
+          setUser({ user: userDoc, isAuthenticating: false });
+        });
         return;
       }
 

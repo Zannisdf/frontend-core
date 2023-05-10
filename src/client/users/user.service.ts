@@ -45,7 +45,13 @@ export class UserService {
     });
   }
 
-  activateUser(email: string) {
+  activateUser({
+    email,
+    practiceAddresses,
+  }: {
+    email: string;
+    practiceAddresses: string[];
+  }) {
     const userRef = collection(db, "users");
     const q = query(userRef, where("email", "==", email));
 
@@ -61,7 +67,10 @@ export class UserService {
           promises.push(Promise.resolve({ sendEmail: true, user: data }));
         } else {
           promises.push(
-            updateDoc(snapshot.ref, { isActivePractitioner: true }),
+            updateDoc(snapshot.ref, {
+              isActivePractitioner: true,
+              practiceAddresses,
+            })
           );
           sendEmail = true;
         }
@@ -70,7 +79,7 @@ export class UserService {
       return Promise.all(promises)
         .then(([user]) => {
           if (sendEmail) {
-            this.notifyUserActivated(email)
+            this.notifyUserActivated(email);
           }
 
           return user;
@@ -95,9 +104,12 @@ export class UserService {
     });
   }
 
-  async getOrCreateUser(user: any) {
+  async getOrCreateUser(user: any, email?: string) {
     const userRef = collection(db, "users");
-    const q = query(userRef, where("userId", "==", user.uid));
+    const predicate = email
+      ? where("email", "==", email)
+      : where("userId", "==", user.uid);
+    const q = query(userRef, predicate);
 
     const snapshots = await getDocs(q);
     const data: any[] = [];

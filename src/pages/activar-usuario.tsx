@@ -10,15 +10,28 @@ import { useEffect, useState } from "react";
 
 const ActivarUsuario = () => {
   const { user } = useUser();
-  const { replace, query } = useRouter();
+  const { replace } = useRouter();
   const [isValidating, setIsValidating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const activateUser = async ({ email }: { email: string }) => {
+  const activateUser = async ({
+    email,
+    address1,
+    address2,
+    address3,
+  }: {
+    email: string;
+    address1: string;
+    address2?: string;
+    address3?: string;
+  }) => {
     setIsValidating(true);
 
-    await userService.activateUser(email).catch((error) => {
+    await userService.activateUser({
+      email,
+      practiceAddresses: [address1, address2, address3].filter(a => !!a) as string[],
+    }).catch((error) => {
       console.log(error);
       messageApi.open({
         type: "error",
@@ -39,28 +52,8 @@ const ActivarUsuario = () => {
       return;
     }
 
-    if (query.email && typeof query.email === "string") {
-      userService
-        .activateUser(query.email)
-        .then(() => {
-          setIsLoading(false);
-          setIsValidating(false);
-          messageApi.open({
-            type: "success",
-            content: `Se activó el usuario ${query.email}`,
-          });
-        })
-        .catch((error) => {
-          console.log(error);
-          messageApi.open({
-            type: "error",
-            content: `Ocurrió un error activando el correo ${query.email}`,
-          });
-        });
-    } else {
-      setIsLoading(false);
-      setIsValidating(false);
-    }
+    setIsLoading(false);
+    setIsValidating(false);
   }, []);
 
   return (

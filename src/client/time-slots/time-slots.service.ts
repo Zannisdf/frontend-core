@@ -3,6 +3,7 @@ import {
   addDays,
   eachDayOfInterval,
   eachHourOfInterval,
+  endOfDay,
   endOfHour,
   format,
   isAfter,
@@ -210,6 +211,55 @@ export class TimeSlotsService {
       });
 
       return formattedDates;
+    });
+  }
+
+  getPublicTimeSlots(practitionerId: string) {
+    const now = new Date();
+    const timeSlotsRef = collection(db, "timeSlots");
+    const q = query(
+      timeSlotsRef,
+      where("practitionerId", "==", practitionerId),
+      where("start", ">", Timestamp.fromDate(startOfDay(now))),
+      where("start", "<", Timestamp.fromDate(endOfDay(now)))
+    );
+
+    const groupedByAddress: Record<string, any> = {};
+
+    return getDocs(q).then((snapshots) => {
+      const formattedDate = format(now, "iii dd/MM", { locale: es });
+
+      snapshots.forEach((snapshot) => {
+        const timeSlot = snapshot.data();
+        const start = timeSlot.start.toDate();
+
+        if (timeSlot.status !== "FREE") return;
+
+        groupedByAddress[timeSlot.practiceAddress] = {
+          ...groupedByAddress[timeSlot.practiceAddress],
+          date: `${formattedDate[0].toUpperCase()}${formattedDate.slice(1)}`,
+          address: timeSlot.practiceAddress,
+          insuranceProviders: ["Fonasa", "Isapre", "Particular"],
+          timeSlots: [
+            ...(groupedByAddress[timeSlot.practiceAddress]?.["timeSlots"] ||
+              []),
+            {
+              id: snapshot.id,
+              label: `${format(start, "HH:mm")} - ${format(
+                endOfHour(start),
+                "HH:mm"
+              )}`,
+            },
+          ],
+        };
+      });
+
+      const readableDate = format(now, "iiii dd/MM", { locale: es });
+
+      return {
+        date: `${readableDate[0].toUpperCase()}${readableDate.slice(1)}`,
+        results: Object.values(groupedByAddress),
+      };
     });
   }
 

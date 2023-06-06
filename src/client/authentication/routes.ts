@@ -4,6 +4,7 @@ export const availableRoutes = {
   waitingActivation: { path: "/verificacion", label: "Verificación de cuenta" },
   login: { path: "/login", label: "Iniciar Sesión" },
   activateUser: { path: "/activar-usuario", label: "Activar" },
+  users: { path: "/usuarios", label: "Usuarios" },
   index: { path: "/", label: "Inicio" },
 } as const;
 
@@ -16,4 +17,7 @@ export const protectedRoutes = [
 
 export const signedInNavbarRoutes = [availableRoutes.timeSlots];
 
-export const superUserNavbarRoutes = [availableRoutes.activateUser];
+export const superUserNavbarRoutes = [
+  availableRoutes.activateUser,
+  availableRoutes.users,
+];

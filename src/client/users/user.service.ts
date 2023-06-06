@@ -22,6 +22,11 @@ export type UserDoc = {
   specialty: string;
   isActivePractitioner?: boolean;
   isSuperUser?: boolean;
+  description?: string;
+  picture?: string;
+  code: string;
+  addressTags?: string[];
+  insuranceProviders?: string[][];
 };
 
 export class UserService {
@@ -98,7 +103,7 @@ export class UserService {
     return getDocs(q).then((snapshots) => {
       const data: UserDoc[] = [];
 
-      snapshots.forEach((snapshot) => snapshot.data());
+      snapshots.forEach((snapshot) => data.push(snapshot.data() as UserDoc));
 
       return data[0];
     });
@@ -122,7 +127,7 @@ export class UserService {
       return data[0];
     }
 
-    const payload: UserDoc = {
+    const payload: Partial<UserDoc> = {
       userId: user.uid,
       countryCode: "CL",
       names: "",
@@ -167,6 +172,44 @@ export class UserService {
     return this.getUser(userId).then(
       ({ isActivePractitioner = false }) => isActivePractitioner
     );
+  }
+
+  listUsers() {
+    const userRef = collection(db, "users");
+
+    return getDocs(userRef).then((snapshots) => {
+      const data: UserDoc[] = [];
+
+      snapshots.forEach((snapshot) => data.push(snapshot.data() as UserDoc));
+
+      return data;
+    });
+  }
+
+  getPractitionersBySpecialty(specialtyId: string) {
+    const userRef = collection(db, "users");
+    const q = query(userRef, where("specialty", "==", specialtyId));
+
+    return getDocs(q).then((snapshots) => {
+      const data: UserDoc[] = [];
+
+      snapshots.forEach((snapshot) => data.push(snapshot.data() as UserDoc));
+
+      return data;
+    });
+  }
+
+  async getPractitionerByCode(code: string) {
+    const userRef = collection(db, "users");
+    const q = query(userRef, where("code", "==", code));
+
+    return getDocs(q).then((snapshots) => {
+      const data: UserDoc[] = [];
+
+      snapshots.forEach((snapshot) => data.push(snapshot.data() as UserDoc));
+
+      return data[0];
+    });
   }
 }
 

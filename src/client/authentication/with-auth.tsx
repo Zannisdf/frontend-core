@@ -3,11 +3,16 @@ import { User, useUser } from "../users/user-context";
 import { ComponentProps, JSXElementConstructor, useEffect } from "react";
 import { availableRoutes, protectedRoutes } from "./routes";
 
+type Options = {
+  superUserOnly?: boolean;
+}
+
 const needsLogin = (user: User, currentPath: string) =>
   !user && protectedRoutes.some(({ path }) => path === currentPath);
 
 export const WithAuth = <T extends JSXElementConstructor<any>>(
-  Component: T
+  Component: T,
+  options: Options = {}
 ) => {
   const WithAuthView = (pageProps: ComponentProps<T>) => {
     const { user } = useUser();
@@ -24,6 +29,15 @@ export const WithAuth = <T extends JSXElementConstructor<any>>(
         replace(availableRoutes.waitingActivation.path);
       }
     }, [redirectToLoginPage]);
+
+    useEffect(() => {
+      if (!options.superUserOnly) return;
+
+      if (!user?.isSuperUser) {
+        replace(availableRoutes.timeSlots.path);
+        return;
+      }
+    }, []);
 
     return <Component {...pageProps} />;
   };

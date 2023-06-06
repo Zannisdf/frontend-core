@@ -148,8 +148,8 @@ export const Profile = ({ user }: { user: UserDoc }) => {
         >
           {(fields, { add }) => (
             <div>
-              {fields.map((field) => (
-                <Form.Item {...field} label="Dirección de la consulta">
+              {fields.map((field, index) => (
+                <Form.Item {...field} key={`address-field-${index}`} label="Dirección de la consulta">
                   <Input placeholder="Av. Siempreviva 123, Providencia" />
                 </Form.Item>
               ))}

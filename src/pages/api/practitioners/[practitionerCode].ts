@@ -80,7 +80,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const user = await userService.getPractitionerByCode(practitionerCode);
-    const timeSlots = await timeSlotsService.getPublicTimeSlots(user.userId);
+    const insuranceProviders: Record<string, string> = {}
+    user.practiceAddresses.forEach((address, index) => {
+      insuranceProviders[address] = user.insuranceProviders?.[index] || ''
+    })
+    const timeSlots = await timeSlotsService.getPublicTimeSlots(user.userId, insuranceProviders);
     return res.status(200).json(getViewData(user, timeSlots));
   } catch (error: any) {
     console.log(error.message);

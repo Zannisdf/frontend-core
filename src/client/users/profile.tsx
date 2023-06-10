@@ -137,7 +137,7 @@ export const Profile = ({ user }: { user: UserDoc }) => {
         <Form.Item
           label="Comunas de atención (separadas por coma y sin espacios)"
           name="addressTags"
-          initialValue={user.addressTags}
+          initialValue={user.addressTags?.join(',')}
         >
           <Input placeholder="Las Condes,Providencia" />
         </Form.Item>
@@ -149,7 +149,11 @@ export const Profile = ({ user }: { user: UserDoc }) => {
           {(fields, { add }) => (
             <div>
               {fields.map((field, index) => (
-                <Form.Item {...field} key={`address-field-${index}`} label="Dirección de la consulta">
+                <Form.Item
+                  {...field}
+                  key={`address-field-${index}`}
+                  label="Dirección de la consulta"
+                >
                   <Input placeholder="Av. Siempreviva 123, Providencia" />
                 </Form.Item>
               ))}
@@ -163,6 +167,37 @@ export const Profile = ({ user }: { user: UserDoc }) => {
                   onClick={() => add()}
                 >
                   Agregar otra dirección
+                </Button>
+              </Form.Item>
+            </div>
+          )}
+        </Form.List>
+
+        <Form.List
+          name="insuranceProviders"
+          initialValue={user.insuranceProviders}
+        >
+          {(fields, { add }) => (
+            <div>
+              {fields.map((field, index) => (
+                <Form.Item
+                  {...field}
+                  key={`insurance-provider-field-${index}`}
+                  label="Cobertura"
+                >
+                  <Input placeholder="Fonasa,Isapre" />
+                </Form.Item>
+              ))}
+
+              <Form.Item style={{ justifyContent: "flex-end" }}>
+                <Button
+                  block
+                  size="middle"
+                  type="dashed"
+                  htmlType="button"
+                  onClick={() => add()}
+                >
+                  Agregar cobertura para otra dirección
                 </Button>
               </Form.Item>
             </div>

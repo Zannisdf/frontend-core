@@ -26,7 +26,7 @@ export type UserDoc = {
   picture?: string;
   code: string;
   addressTags?: string[];
-  insuranceProviders?: string[][];
+  insuranceProviders?: string[];
 };
 
 export class UserService {

@@ -214,13 +214,16 @@ export class TimeSlotsService {
     });
   }
 
-  getPublicTimeSlots(practitionerId: string) {
+  async getPublicTimeSlots(
+    practitionerId: string,
+    insuranceProviders: Record<string, string>
+  ) {
     const now = new Date();
     const timeSlotsRef = collection(db, "timeSlots");
     const q = query(
       timeSlotsRef,
       where("practitionerId", "==", practitionerId),
-      where("start", ">", Timestamp.fromDate(startOfDay(now))),
+      where("start", ">", Timestamp.fromDate(now)),
       where("start", "<", Timestamp.fromDate(endOfDay(now)))
     );
 
@@ -239,7 +242,8 @@ export class TimeSlotsService {
           ...groupedByAddress[timeSlot.practiceAddress],
           date: `${formattedDate[0].toUpperCase()}${formattedDate.slice(1)}`,
           address: timeSlot.practiceAddress,
-          insuranceProviders: ["Fonasa", "Isapre", "Particular"],
+          insuranceProviders:
+            insuranceProviders[timeSlot.practiceAddress].split(","),
           timeSlots: [
             ...(groupedByAddress[timeSlot.practiceAddress]?.["timeSlots"] ||
               []),

@@ -22,6 +22,7 @@ import {
   Timestamp,
   doc,
   writeBatch,
+  updateDoc,
 } from "firebase/firestore";
 
 export type TimeSlotDoc = {
@@ -43,6 +44,11 @@ export class TimeSlotsService {
       console.log(error);
       return null;
     });
+  }
+
+  updateTimeSlot(id: string, data: Partial<TimeSlotDoc>) {
+    const ref = doc(db, "timeSlots", id);
+    return updateDoc(ref, data);
   }
 
   async updateTimeSlots(

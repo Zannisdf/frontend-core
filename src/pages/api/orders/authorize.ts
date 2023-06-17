@@ -79,7 +79,7 @@ const authorize = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const response = await paymentsService.getPaymentStatus(token);
 
-    if (response.status === 1) {
+    if (response.status === 2) {
       await ordersClient.update(response.commerceOrder, { status: "PAID" });
       const order = await ordersClient.get(response.commerceOrder);
 
@@ -89,7 +89,7 @@ const authorize = async (req: NextApiRequest, res: NextApiResponse) => {
 
       await Promise.all([sendUserEmail(order), sendPractitionerEmail(order)]);
 
-      return res.status(201).json({ status: "ok" });
+      return res.status(200).json({ status: "ok" });
     }
 
     console.error("Something went wrong: ", response);

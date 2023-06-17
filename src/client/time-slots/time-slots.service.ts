@@ -23,6 +23,7 @@ import {
   doc,
   writeBatch,
   updateDoc,
+  getDoc,
 } from "firebase/firestore";
 
 export type TimeSlotDoc = {
@@ -30,10 +31,20 @@ export type TimeSlotDoc = {
   intervalInMinutes: 60;
   practitionerId: string;
   status?: "FREE" | "RESERVED" | "PAID" | "FINISHED" | "NO_SHOW";
-  practiceAddress: string | null;
+  practiceAddress: string;
 };
 
 export class TimeSlotsService {
+  get(id: string) {
+    const ref = doc(db, "timeSlots", id);
+    return getDoc(ref)
+      .then((snapshot) => snapshot.data() as TimeSlotDoc)
+      .catch((error) => {
+        console.error(error);
+        return null;
+      });
+  }
+
   addTimeSlot(timeSlot: TimeSlotDoc) {
     return addDoc(collection(db, "timeSlots"), {
       status: "FREE",

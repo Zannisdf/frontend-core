@@ -4,6 +4,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 const getPayment = async (req: NextApiRequest, res: NextApiResponse) => {
   const { token } = req.body;
 
+  console.log('context', req.body);
+
   try {
     const { itemId } = await paymentsService.getPaymentStatus(token);
 
@@ -12,8 +14,6 @@ const getPayment = async (req: NextApiRequest, res: NextApiResponse) => {
     });
   } catch (error) {
     console.error(error);
-    console.log('context', req.body);
-    console.log('type', typeof req.body)
     return res.status(500).json({ error: true });
   }
 };

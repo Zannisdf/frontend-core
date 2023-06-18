@@ -247,8 +247,6 @@ export class TimeSlotsService {
     const groupedByAddress: Record<string, any> = {};
 
     return getDocs(q).then((snapshots) => {
-      const formattedDate = format(now, "iii dd/MM", { locale: es });
-
       snapshots.forEach((snapshot) => {
         const timeSlot = snapshot.data();
         const start = timeSlot.start.toDate();
@@ -257,7 +255,7 @@ export class TimeSlotsService {
 
         groupedByAddress[timeSlot.practiceAddress] = {
           ...groupedByAddress[timeSlot.practiceAddress],
-          date: `${formattedDate[0].toUpperCase()}${formattedDate.slice(1)}`,
+          date: now,
           address: timeSlot.practiceAddress,
           insuranceProviders:
             insuranceProviders[timeSlot.practiceAddress].split(","),
@@ -266,19 +264,15 @@ export class TimeSlotsService {
               []),
             {
               id: snapshot.id,
-              label: `${format(start, "HH:mm")} - ${format(
-                endOfHour(start),
-                "HH:mm"
-              )}`,
+              start,
+              intervalInMinutes: timeSlot.intervalInMinutes,
             },
           ],
         };
       });
 
-      const readableDate = format(now, "iiii dd/MM", { locale: es });
-
       return {
-        date: `${readableDate[0].toUpperCase()}${readableDate.slice(1)}`,
+        date: now,
         results: Object.values(groupedByAddress),
       };
     });

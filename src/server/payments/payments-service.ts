@@ -64,6 +64,27 @@ export class PaymentsService {
     });
   }
 
+  getPaymentStatusByOrderId(orderId: string) {
+    const params = new URLSearchParams({
+      apiKey: String(process.env.PAYMENT_PROVIDER_FLOW_API_KEY),
+      commerceId: orderId,
+    });
+
+    this.addSignature(params);
+
+    return fetch(
+      `${process.env.PAYMENT_PROVIDER_FLOW_STATUS_BY_ITEM_ID_URL}?${params.toString()}`
+    ).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      return response.text().then((error) => {
+        throw new Error(error);
+      });
+    });
+  }
+
   addSignature(params: URLSearchParams) {
     const keys = Object.keys(Object.fromEntries(params)).sort();
     let signatureContent = "";

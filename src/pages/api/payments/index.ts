@@ -12,6 +12,8 @@ const getPayment = async (req: NextApiRequest, res: NextApiResponse) => {
     });
   } catch (error) {
     console.error(error);
+    console.log('context', req.body);
+    console.log('type', typeof req.body)
     return res.status(500).json({ error: true });
   }
 };

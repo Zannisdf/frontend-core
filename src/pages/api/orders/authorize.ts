@@ -2,10 +2,24 @@ import { OrderDoc, ordersClient } from "@frontend-core/server/orders";
 import { paymentsService } from "@frontend-core/server/payments/payments-service";
 import nodemailer from "nodemailer";
 import { NextApiRequest, NextApiResponse } from "next";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 
-const formatDate = (date: Date) => format(date, "PPPPpppp", { locale: es });
+const formatDate = (date: Date, intervalInMinutes: number) => {
+  const readableDate = new Intl.DateTimeFormat("es-CL", {
+    dateStyle: "full",
+    timeZone: "America/Santiago",
+  }).format(date);
+  const hourFormatter = new Intl.DateTimeFormat("es-CL", {
+    timeStyle: "short",
+    timeZone: "America/Santiago",
+  });
+  const endDate = new Date(date.getTime() + intervalInMinutes * 60 * 1000);
+  const startHours = hourFormatter.format(date);
+  const endHours = hourFormatter.format(endDate);
+
+  return `${
+    readableDate[0].toUpperCase() + readableDate.slice(1)
+  } a las ${startHours} - ${endHours}`;
+};
 
 const sendUserEmail = (order: OrderDoc) => {
   const transporter = nodemailer.createTransport({
@@ -23,15 +37,12 @@ const sendUserEmail = (order: OrderDoc) => {
     text: [
       `Hola ${order.customerName},`,
       "Hemos recibido tu solicitud de sobrecupo 😃",
-      "Al momento de llegar, por favor dirígete a recepción o caja indicando tu sobrecupo y paga tu consulta donde corresponda.",
-      "\n",
-      "Detalles del sobrecupo solicitado:",
-      "\n",
+      "Al momento de llegar, por favor dirígete a recepción o caja indicando tu sobrecupo y paga tu consulta donde corresponda.\n",
+      "Detalles del sobrecupo solicitado:\n",
       `Profesional: ${order.practitionerName}`,
-      `Fecha de atención: ${formatDate(order.start)}`,
-      `Dirección: ${order.practiceAddress}`,
-      "\n",
-      "Gracias por su preferencia.",
+      `Fecha de atención: ${formatDate(order.start, order.intervalInMinutes)}`,
+      `Dirección: ${order.practiceAddress}\n`,
+      "Gracias por tu preferencia.",
     ].join("\n"),
   };
 
@@ -53,19 +64,13 @@ const sendPractitionerEmail = (order: OrderDoc) => {
     subject: `Tienes un nuevo sobrecupo`,
     text: [
       `Hola ${order.practitionerName},`,
-      "Tienes un nuevo sobrecupo, a continuación adjuntamos los detalles:",
-      "\n",
+      "Tienes un nuevo sobrecupo, a continuación adjuntamos los detalles:\n",
       "Datos del paciente:",
       `Nombre: ${order.customerName}`,
       `Email: ${order.customerEmail}`,
-      `Teléfono: ${order.customerPhone}`,
-      "\n",
-      "Fecha:",
-      formatDate(order.start),
-      "\n",
-      "Ubicación:",
-      order.practiceAddress,
-      "\n",
+      `Teléfono: ${order.customerPhone}\n`,
+      `Fecha: ${formatDate(order.start, order.intervalInMinutes)}`,
+      `Dirección: ${order.practiceAddress}\n`,
       "¡Que tengas un excelente día!",
     ].join("\n"),
   };

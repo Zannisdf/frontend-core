@@ -2,15 +2,13 @@ import { paymentsService } from "@frontend-core/server/payments/payments-service
 import { NextApiRequest, NextApiResponse } from "next";
 
 const getPayment = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { token } = req.body;
-
-  console.log('context', req.body);
+  const { token } = JSON.parse(req.body);
 
   try {
-    const { itemId } = await paymentsService.getPaymentStatus(token);
+    const { commerceOrder } = await paymentsService.getPaymentStatus(token);
 
     return res.status(200).json({
-      itemId,
+      itemId: commerceOrder,
     });
   } catch (error) {
     console.error(error);

@@ -2,6 +2,7 @@ import { OrderDoc, ordersClient } from "@frontend-core/server/orders";
 import { paymentsService } from "@frontend-core/server/payments/payments-service";
 import nodemailer from "nodemailer";
 import { NextApiRequest, NextApiResponse } from "next";
+import { timeSlotsService } from "@frontend-core/client/time-slots/time-slots.service";
 
 const formatDate = (date: Date, intervalInMinutes: number) => {
   const readableDate = new Intl.DateTimeFormat("es-CL", {
@@ -93,13 +94,18 @@ const authorize = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       await Promise.all([sendUserEmail(order), sendPractitionerEmail(order)]);
-
-      return res.status(200).json({ status: "ok" });
     }
 
-    console.error("Something went wrong: ", response);
+    if (response.status === 3 || response.status === 4) {
+      await Promise.all([
+        ordersClient.delete(response.commerceOrder),
+        timeSlotsService.updateTimeSlot(response.commerceOrder, {
+          status: "FREE",
+        }),
+      ]);
+    }
 
-    return res.status(500).json({});
+    return res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error("Something went wrong: ", error);
 

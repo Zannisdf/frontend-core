@@ -1,5 +1,6 @@
 import {
   Timestamp,
+  deleteDoc,
   doc,
   getDoc,
   serverTimestamp,
@@ -66,6 +67,11 @@ export class OrdersClient {
       ...data,
       updatedAt: serverTimestamp(),
     });
+  }
+
+  delete(id: string) {
+    const ref = doc(db, "timeSlots", id);
+    return deleteDoc(ref);
   }
 }
 

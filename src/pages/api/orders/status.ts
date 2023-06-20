@@ -12,15 +12,15 @@ const statusById = new Map([
 ]);
 
 const getOrderStatus = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { itemId } = req.query;
+  const { paymentId } = req.query;
 
-  if (typeof itemId !== "string") {
+  if (typeof paymentId !== "string") {
     return res.status(404).json({ notFound: true });
   }
 
   const [payment, order] = await Promise.all([
-    paymentsService.getPaymentStatusByOrderId(itemId),
-    ordersClient.get(itemId),
+    paymentsService.getPaymentStatus(paymentId),
+    ordersClient.get(paymentId),
   ]).catch((error) => {
     console.error(error);
     return [null, null];

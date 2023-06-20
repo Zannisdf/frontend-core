@@ -61,17 +61,14 @@ const DATA_BY_SPECIALTY_ID: Record<string, any> = {
   },
 };
 
-const getViewData = (user: UserDoc, schedule: any) => {
+const getViewData = (user: UserDoc) => {
   return {
-    profile: {
-      name: `${user.names} ${user.surnames}`,
-      specialty: DATA_BY_SPECIALTY_ID[user.specialty].title,
-      picture: user.picture,
-      insuranceProviders: ["Isapre", "Fonasa", "Particular"],
-      licenseId: user.licenseId,
-      description: user.description,
-    },
-    schedule,
+    name: `${user.names} ${user.surnames}`,
+    specialty: DATA_BY_SPECIALTY_ID[user.specialty].title,
+    picture: user.picture,
+    insuranceProviders: ["Isapre", "Fonasa", "Particular"],
+    licenseId: user.licenseId,
+    description: user.description,
   };
 };
 
@@ -80,14 +77,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const user = await userService.getPractitionerByCode(practitionerCode);
-    const insuranceProviders: Record<string, string> = {}
-    user.practiceAddresses.forEach((address, index) => {
-      insuranceProviders[address] = user.insuranceProviders?.[index] || ''
-    })
-    const timeSlots = await timeSlotsService.getPublicTimeSlots(user.userId, insuranceProviders);
-    return res.status(200).json(getViewData(user, timeSlots));
+    return res.status(200).json(getViewData(user));
   } catch (error: any) {
     console.log(error.message);
-    return res.status(500).json({});
+    return res.status(500).json({ error });
   }
 };

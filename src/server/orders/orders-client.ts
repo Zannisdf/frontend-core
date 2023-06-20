@@ -62,7 +62,7 @@ export class OrdersClient {
   }
 
   update(id: string, data: Partial<OrderDoc>) {
-    const ref = doc(db, "timeSlots", id);
+    const ref = doc(db, "orders", id);
     return updateDoc(ref, {
       ...data,
       updatedAt: serverTimestamp(),
@@ -70,7 +70,7 @@ export class OrdersClient {
   }
 
   delete(id: string) {
-    const ref = doc(db, "timeSlots", id);
+    const ref = doc(db, "orders", id);
     return deleteDoc(ref);
   }
 }

@@ -28,7 +28,7 @@ import {
 
 export type TimeSlotDoc = {
   start: Date;
-  intervalInMinutes: 60;
+  intervalInMinutes: number;
   practitionerId: string;
   status?: "FREE" | "RESERVED" | "PAID" | "FINISHED" | "NO_SHOW";
   practiceAddress: string;
@@ -49,7 +49,7 @@ export class TimeSlotsService {
     return addDoc(collection(db, "timeSlots"), {
       status: "FREE",
       practitionerId: timeSlot.practitionerId,
-      intervalInMinutes: 60,
+      intervalInMinutes: 59,
       start: Timestamp.fromDate(timeSlot.start),
     }).catch((error) => {
       console.log(error);
@@ -127,7 +127,7 @@ export class TimeSlotsService {
         batch.set(ref, {
           status: "FREE",
           practitionerId: practitionerId,
-          intervalInMinutes: 60,
+          intervalInMinutes: 59,
           start: Timestamp.fromDate(new Date(date)),
           practiceAddress: timeSlot.practiceAddress,
         });

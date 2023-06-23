@@ -2,8 +2,6 @@ import { timeSlotsService } from "@frontend-core/client/time-slots/time-slots.se
 import { userService } from "@frontend-core/client/users/user.service";
 import { ordersClient } from "@frontend-core/server/orders";
 import { paymentsService } from "@frontend-core/server/payments/payments-service";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const createOrder = async (req: NextApiRequest, res: NextApiResponse) => {

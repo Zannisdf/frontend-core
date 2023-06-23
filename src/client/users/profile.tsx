@@ -137,7 +137,7 @@ export const Profile = ({ user }: { user: UserDoc }) => {
         <Form.Item
           label="Comunas de atención (separadas por coma y sin espacios)"
           name="addressTags"
-          initialValue={user.addressTags?.join(',')}
+          initialValue={user.addressTags?.join(",")}
         >
           <Input placeholder="Las Condes,Providencia" />
         </Form.Item>

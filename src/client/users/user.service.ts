@@ -27,6 +27,7 @@ export type UserDoc = {
   code: string;
   addressTags?: string[];
   insuranceProviders?: string[];
+  hidden?: boolean;
 };
 
 export class UserService {
@@ -188,7 +189,11 @@ export class UserService {
 
   getPractitionersBySpecialty(specialtyId: string) {
     const userRef = collection(db, "users");
-    const q = query(userRef, where("specialty", "==", specialtyId));
+    const q = query(
+      userRef,
+      where("specialty", "==", specialtyId),
+      where("hidden", "!=", true)
+    );
 
     return getDocs(q).then((snapshots) => {
       const data: UserDoc[] = [];

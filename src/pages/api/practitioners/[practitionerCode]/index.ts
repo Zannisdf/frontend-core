@@ -73,6 +73,7 @@ const getViewData = (user: UserDoc) => {
     seo: {
       ...DATA_BY_SPECIALTY_ID[user.specialty].seo,
       description: user.description,
+      noIndex: !!user.hidden,
     },
     profile: {
       name: `${user.names} ${user.surnames}`,

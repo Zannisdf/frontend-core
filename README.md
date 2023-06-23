@@ -1,2 +1,2 @@
 Staging url
-staging.sobrecupos.com
+staging.sobrecupos.app

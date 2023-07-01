@@ -85,6 +85,10 @@ const getViewData = (user: UserDoc) => {
   };
 };
 
+export const config = {
+  runtime: 'edge'
+}
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const practitionerCode = req.query["practitionerCode"] as string;
 

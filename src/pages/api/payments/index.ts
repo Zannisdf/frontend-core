@@ -8,6 +8,10 @@ const statusById = new Map([
   [4, "CANCELED"],
 ]);
 
+export const config = {
+  runtime: 'edge'
+}
+
 const getPayment = async (req: NextApiRequest, res: NextApiResponse) => {
   const { paymentId } = JSON.parse(req.body);
 

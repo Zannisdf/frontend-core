@@ -2,10 +2,6 @@ import { timeSlotsService } from "@frontend-core/client/time-slots/time-slots.se
 import { userService } from "@frontend-core/client/users/user.service";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export const config = {
-  runtime: 'edge'
-}
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const practitionerCode = req.query["practitionerCode"] as string;
 

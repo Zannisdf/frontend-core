@@ -4,10 +4,6 @@ import { ordersClient } from "@frontend-core/server/orders";
 import { paymentsService } from "@frontend-core/server/payments/payments-service";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export const config = {
-  runtime: 'edge'
-}
-
 const createOrder = async (req: NextApiRequest, res: NextApiResponse) => {
   const { itemId, email, name, phone, authorization, termsAndConditions } =
     req.body;

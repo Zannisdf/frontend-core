@@ -85,10 +85,6 @@ const getViewData = (specialtyId: string, users: UserDoc[]) => {
   };
 };
 
-export const config = {
-  runtime: 'edge'
-}
-
 export default (req: NextApiRequest, res: NextApiResponse) => {
   const specialtyId = req.query["specialtyId"] as string;
 

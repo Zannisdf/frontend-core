@@ -1,10 +1,6 @@
 import { ordersClient } from "@frontend-core/server/orders";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export const config = {
-  runtime: 'edge'
-}
-
 const getOrderStatus = async (req: NextApiRequest, res: NextApiResponse) => {
   const { itemId } = req.query;
 

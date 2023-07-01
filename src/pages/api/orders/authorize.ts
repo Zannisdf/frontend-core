@@ -4,10 +4,6 @@ import nodemailer from "nodemailer";
 import { NextApiRequest, NextApiResponse } from "next";
 import { timeSlotsService } from "@frontend-core/client/time-slots/time-slots.service";
 
-export const config = {
-  runtime: 'edge'
-}
-
 const formatDate = (date: Date, intervalInMinutes: number) => {
   const readableDate = new Intl.DateTimeFormat("es-CL", {
     dateStyle: "full",

@@ -206,6 +206,7 @@ export class UserService {
 
         user.latestTimeSlots ||= [];
         user.latestTimeSlots = user.latestTimeSlots
+          .filter((timeSlot: any) => timeSlot.status === "FREE")
           .map((timeSlot: any) => timeSlot.start.toDate())
           .filter((date: Date) => isBefore(now, date));
 

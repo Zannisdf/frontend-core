@@ -58,9 +58,29 @@ export class TimeSlotsService {
     });
   }
 
-  updateTimeSlot(id: string, data: Partial<TimeSlotDoc>) {
+  async updateTimeSlot(id: string, data: Partial<TimeSlotDoc>) {
     const ref = doc(db, "timeSlots", id);
-    return updateDoc(ref, data);
+    await updateDoc(ref, data);
+    const timeSlotDoc = await getDoc(ref);
+    const { practitionerId } = timeSlotDoc.data() as TimeSlotDoc;
+    const timeSlotsRef = collection(db, "timeSlots");
+    const q = query(
+      timeSlotsRef,
+      where("practitionerId", "==", practitionerId),
+      where("start", ">", Timestamp.fromDate(new Date()))
+    );
+    const user: Partial<UserDoc> & Required<Pick<UserDoc, "latestTimeSlots">> =
+      {
+        userId: practitionerId,
+        latestTimeSlots: [],
+      };
+    const updatedSnapshots = await getDocs(q);
+
+    updatedSnapshots.forEach((snapshot) => {
+      user.latestTimeSlots.push(snapshot.data());
+    });
+
+    await userService.editUser(user);
   }
 
   async updateTimeSlots(

@@ -73,15 +73,18 @@ const getViewData = (specialtyId: string, users: UserDoc[]) => {
 
   return {
     ...specialtyData,
-    practitioners: users.map(
-      ({ picture, names, surnames, code, addressTags, specialty }) => ({
-        picture,
-        name: `${names} ${surnames}`,
-        code,
-        addressTags,
-        specialty: specialtyData.title,
-      })
-    ),
+    practitioners: users
+      .map(
+        ({ picture, names, surnames, code, addressTags, latestTimeSlots }) => ({
+          picture,
+          name: `${names} ${surnames}`,
+          code,
+          addressTags,
+          specialty: specialtyData.title,
+          timeSlotCount: latestTimeSlots.length,
+        })
+      )
+      .sort((userA, userB) => userB.timeSlotCount - userA.timeSlotCount),
   };
 };
 

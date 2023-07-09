@@ -1,4 +1,5 @@
 import { db } from "@frontend-core/server/firebase/db";
+import { isBefore } from "date-fns";
 import {
   addDoc,
   collection,
@@ -28,6 +29,7 @@ export type UserDoc = {
   addressTags?: string[];
   insuranceProviders?: string[];
   hidden?: boolean;
+  latestTimeSlots: Record<string, any>[];
 };
 
 export class UserService {
@@ -198,7 +200,22 @@ export class UserService {
     return getDocs(q).then((snapshots) => {
       const data: UserDoc[] = [];
 
-      snapshots.forEach((snapshot) => data.push(snapshot.data() as UserDoc));
+      snapshots.forEach((snapshot) => {
+        const user = snapshot.data();
+        const now = new Date();
+
+        user.latestTimeSlots ||= [];
+        user.latestTimeSlots = user.latestTimeSlots
+          .map((timeSlot: any) => timeSlot.start.toDate())
+          .filter((date: Date) => isBefore(now, date));
+
+        data.push(user as UserDoc);
+      });
+
+      data.sort(
+        (userA, userB) =>
+          userB.latestTimeSlots.length - userA.latestTimeSlots.length
+      );
 
       return data;
     });

@@ -25,6 +25,7 @@ import {
   updateDoc,
   getDoc,
 } from "firebase/firestore";
+import { UserDoc, userService } from "../users/user.service";
 
 export type TimeSlotDoc = {
   start: Date;
@@ -137,6 +138,19 @@ export class TimeSlotsService {
     });
 
     await batch.commit();
+
+    const user: Partial<UserDoc> & Required<Pick<UserDoc, "latestTimeSlots">> =
+      {
+        userId: practitionerId,
+        latestTimeSlots: [],
+      };
+    const updatedSnapshots = await getDocs(q);
+
+    updatedSnapshots.forEach((snapshot) => {
+      user.latestTimeSlots.push(snapshot.data());
+    });
+
+    await userService.editUser(user);
 
     return {
       added,

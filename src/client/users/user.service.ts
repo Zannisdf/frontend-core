@@ -1,5 +1,5 @@
 import { db } from "@frontend-core/server/firebase/db";
-import { isBefore } from "date-fns";
+import { endOfDay, isBefore } from "date-fns";
 import {
   addDoc,
   collection,
@@ -208,7 +208,9 @@ export class UserService {
         user.latestTimeSlots = user.latestTimeSlots
           .filter((timeSlot: any) => timeSlot.status === "FREE")
           .map((timeSlot: any) => timeSlot.start.toDate())
-          .filter((date: Date) => isBefore(now, date));
+          .filter(
+            (date: Date) => isBefore(now, date) && isBefore(date, endOfDay(now))
+          );
 
         data.push(user as UserDoc);
       });

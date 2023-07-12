@@ -282,10 +282,15 @@ export class TimeSlotsService {
 
     const groupedByAddress: Record<string, any> = {};
 
+    console.log(now)
+    console.log(endOfDay(now))
+
     return getDocs(q).then((snapshots) => {
       snapshots.forEach((snapshot) => {
         const timeSlot = snapshot.data();
         const start = timeSlot.start.toDate();
+
+        console.log(start);
 
         if (timeSlot.status !== "FREE") return;
 

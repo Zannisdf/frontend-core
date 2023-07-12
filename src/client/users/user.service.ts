@@ -1,5 +1,6 @@
 import { db } from "@frontend-core/server/firebase/db";
 import { endOfDay, isBefore } from "date-fns";
+import { utcToZonedTime } from "date-fns-tz";
 import {
   addDoc,
   collection,
@@ -202,7 +203,7 @@ export class UserService {
 
       snapshots.forEach((snapshot) => {
         const user = snapshot.data();
-        const now = new Date();
+        const now = utcToZonedTime(new Date(), "America/Santiago");
 
         user.latestTimeSlots ||= [];
         user.latestTimeSlots = user.latestTimeSlots

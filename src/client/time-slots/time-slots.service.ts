@@ -26,6 +26,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { UserDoc, userService } from "../users/user.service";
+import { utcToZonedTime } from "date-fns-tz";
 
 export type TimeSlotDoc = {
   start: Date;
@@ -269,7 +270,8 @@ export class TimeSlotsService {
     practitionerId: string,
     insuranceProviders: Record<string, string>
   ) {
-    const now = new Date();
+    const now = utcToZonedTime(new Date(), 'America/Santiago');
+
     const timeSlotsRef = collection(db, "timeSlots");
     const q = query(
       timeSlotsRef,

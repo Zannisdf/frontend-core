@@ -82,6 +82,8 @@ export class TimeSlotsService {
     });
 
     await userService.editUser(user);
+
+    this.updateRelatedPages(practitionerId);
   }
 
   async updateTimeSlots(
@@ -172,6 +174,8 @@ export class TimeSlotsService {
     });
 
     await userService.editUser(user);
+
+    this.updateRelatedPages(practitionerId);
 
     return {
       added,
@@ -270,7 +274,7 @@ export class TimeSlotsService {
     practitionerId: string,
     insuranceProviders: Record<string, string>
   ) {
-    const now = utcToZonedTime(new Date(), 'America/Santiago');
+    const now = utcToZonedTime(new Date(), "America/Santiago");
 
     const timeSlotsRef = collection(db, "timeSlots");
     const q = query(
@@ -347,6 +351,21 @@ export class TimeSlotsService {
     });
 
     return dates;
+  }
+
+  async updateRelatedPages(practitionerId: string) {
+    try {
+      const user = await userService.getUser(practitionerId);
+
+      fetch(
+        `${process.env.REVALIDATION_BASE_URL}/specialties/${user.specialty}?secret=${process.env.REVALIDATION_SECRET}`
+      ).catch((error) => console.error(error));
+      fetch(
+        `${process.env.REVALIDATION_BASE_URL}/practitioners/${user.code}?secret=${process.env.REVALIDATION_SECRET}`
+      ).catch((error) => console.error(error));
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
 

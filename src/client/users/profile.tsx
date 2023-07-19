@@ -116,6 +116,7 @@ export const Profile = ({ user }: { user: UserDoc }) => {
                 value: "inmunologia-y-alergias",
                 label: "Inmunología y alergias",
               },
+              { value: "dermatologia", label: "Dermatología" },
             ]}
           />
         </Form.Item>

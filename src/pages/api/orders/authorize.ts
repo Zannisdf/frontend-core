@@ -35,16 +35,16 @@ const sendUserEmail = (order: OrderDoc) => {
     from: `Equipo de Sobrecupos <${process.env.MAILER_EMAIL}>`,
     to: order.customerEmail,
     subject: `Detalle de tu sobrecupo`,
-    text: [
+    html: [
       `Hola ${order.customerName},`,
       "Hemos recibido tu solicitud de sobrecupo 😃",
-      "Al momento de llegar, por favor dirígete a recepción o caja indicando tu sobrecupo y paga tu consulta donde corresponda.\n",
-      "Detalles del sobrecupo solicitado:\n",
+      "Al momento de llegar, por favor dirígete a recepción o caja indicando tu sobrecupo y <b>recuerda pagar tu consulta al llegar a la institución médica</b>.\n",
+      "Detalles del sobrecupo solicitado:<br />",
       `Profesional: ${order.practitionerName}`,
       `Fecha de atención: ${formatDate(order.start, order.intervalInMinutes)}`,
-      `Dirección: ${order.practiceAddress}\n`,
+      `Dirección: ${order.practiceAddress}<br />`,
       "Gracias por tu preferencia.",
-    ].join("\n"),
+    ].join("<br />"),
   };
 
   return transporter.sendMail(message);

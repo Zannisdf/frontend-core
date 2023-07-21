@@ -89,10 +89,10 @@ const getViewData = (specialtyId: string, users: UserDoc[]) => {
           code,
           addressTags,
           specialty: specialtyData.title,
-          timeSlotCount: latestTimeSlots.length,
+          timeSlots: latestTimeSlots,
         })
       )
-      .sort((userA, userB) => userB.timeSlotCount - userA.timeSlotCount),
+      .sort((userA, userB) => userB.timeSlots.length - userA.timeSlots.length),
   };
 };
 

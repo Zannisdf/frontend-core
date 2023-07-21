@@ -183,7 +183,11 @@ export class UserService {
     return getDocs(userRef).then((snapshots) => {
       const data: UserDoc[] = [];
 
-      snapshots.forEach((snapshot) => data.push(snapshot.data() as UserDoc));
+      snapshots.forEach((snapshot) => {
+        const { latestTimeSlots: _, ...user } = snapshot.data();
+        
+        data.push(user as UserDoc)
+      });
 
       return data;
     });

@@ -66,6 +66,14 @@ const DATA_BY_SPECIALTY_ID: Record<string, any> = {
         "Descubre a los mejores profesionales en enfermedades del sistema inmunológico. Atención de calidad para fortalecer tu salud. ¡Mejora tu bienestar ahora!",
     },
   },
+  dermatologia: {
+    title: "Dermatología",
+    seo: {
+      title: "Dermatología | Sobrecupos",
+      description:
+        "Descubre a los mejores profesionales especializados en dermatología. Atención de calidad para fortalecer tu salud. ¡Mejora tu bienestar ahora!",
+    },
+  },
 };
 
 const getViewData = (user: UserDoc) => {

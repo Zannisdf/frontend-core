@@ -357,10 +357,10 @@ export class TimeSlotsService {
       const user = await userService.getUser(practitionerId);
 
       fetch(
-        `${process.env.REVALIDATION_BASE_URL}/specialties/${user.specialty}?secret=${process.env.REVALIDATION_SECRET}`
+        `${process.env.REVALIDATION_BASE_URL}/specialties/page/${user.specialty}/revalidate?secret=${process.env.REVALIDATION_SECRET}`
       ).catch((error) => console.error(error));
       fetch(
-        `${process.env.REVALIDATION_BASE_URL}/practitioners/${user.code}?secret=${process.env.REVALIDATION_SECRET}`
+        `${process.env.REVALIDATION_BASE_URL}/practitioners/${user.code}/revalidate?secret=${process.env.REVALIDATION_SECRET}`
       ).catch((error) => console.error(error));
     } catch (error) {
       console.error(error);

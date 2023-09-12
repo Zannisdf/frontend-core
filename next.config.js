@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        destination: 'https://app.sobrecupos.com/sobrecupos',
+        permanent: true,
+      },
+    ]
+  },
   async rewrites() {
     return [
       {
